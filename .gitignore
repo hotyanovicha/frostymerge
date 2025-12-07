@@ -33,3 +33,11 @@ node_modules/
 #//////////////////////////
 .cursor/
 
+#//////////////////////////
+# GitHub Pages
+#//////////////////////////
+# Allow docs/ folder for GitHub Pages deployment
+!docs/
+docs/*
+!docs/**
+
