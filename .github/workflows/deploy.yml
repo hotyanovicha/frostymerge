@@ -1,0 +1,62 @@
+name: Deploy to GitHub Pages
+
+on:
+  workflow_dispatch:
+    description: 'Manually deploy build files to GitHub Pages'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Validate source directory
+        run: |
+          if [ ! -d "FrostyMerge/build/web-mobile" ]; then
+            echo "Error: Source directory 'FrostyMerge/build/web-mobile' not found!"
+            echo "Please make sure you have built the project in Cocos Creator and committed the build files."
+            exit 1
+          fi
+          echo "✓ Source directory found"
+      
+      - name: Clean docs folder
+        run: |
+          if [ -d "docs" ]; then
+            echo "Cleaning existing docs folder..."
+            rm -rf docs/*
+          else
+            echo "Creating docs folder..."
+            mkdir -p docs
+          fi
+      
+      - name: Copy build files to docs
+        run: |
+          echo "Copying files from FrostyMerge/build/web-mobile to docs..."
+          cp -R FrostyMerge/build/web-mobile/* docs/
+          
+          FILE_COUNT=$(find docs -type f | wc -l | tr -d ' ')
+          echo "✓ Copied $FILE_COUNT files to docs/"
+      
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+      
+      - name: Commit and push changes
+        run: |
+          git add docs/
+          
+          if git diff --staged --quiet; then
+            echo "No changes to deploy"
+          else
+            git commit -m "Deploy to GitHub Pages [skip ci]"
+            git push origin main
+            echo "✓ Deployment complete! Changes have been pushed to main branch"
+          fi
+
