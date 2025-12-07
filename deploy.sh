@@ -26,6 +26,9 @@ rm -rf "$TARGET_DIR"/*
 echo "Copying files from $SOURCE_DIR to $TARGET_DIR..."
 cp -R "$SOURCE_DIR"/* "$TARGET_DIR/"
 
+# Add .nojekyll to disable Jekyll processing (fixes underscore file issues)
+touch "$TARGET_DIR/.nojekyll"
+
 # Count files copied
 FILE_COUNT=$(find "$TARGET_DIR" -type f | wc -l | tr -d ' ')
 
